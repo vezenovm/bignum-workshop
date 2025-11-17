@@ -1,7 +1,11 @@
-use crate::BrainpoolP384r1_Fq;
+use crate::{BrainpoolP384r1_Fq, BrainpoolP384r1_Fr};
+
+// ============================================================================
+// Tests for BrainpoolP384r1_Fq (base field)
+// ============================================================================
 
 #[test]
-fn test_from_be_bytes() {
+fn test_fq_from_be_bytes() {
     // Create a simple number: 0x0000...0042 (just 66 in the least significant byte)
     let mut bytes = [0 as u8; 48];
     bytes[47] = 66; // Last byte = 66
@@ -13,7 +17,7 @@ fn test_from_be_bytes() {
 }
 
 #[test]
-fn test_add_simple() {
+fn test_fq_add_simple() {
     // Test: 5 + 3 = 8
     let mut bytes_a = [0 as u8; 48];
     bytes_a[47] = 5;
@@ -29,7 +33,7 @@ fn test_add_simple() {
 }
 
 #[test]
-fn test_add_overflow_limitation() {
+fn test_fq_add_overflow_limitation() {
     // This test demonstrates the limitation of our simple add() implementation
     // When a limb overflows, the carry is NOT propagated to the next limb
 
@@ -57,7 +61,7 @@ fn test_add_overflow_limitation() {
 }
 
 #[test]
-fn test_mul_simple() {
+fn test_fq_mul_simple() {
     // Test: 6 * 7 = 42
     let mut bytes_a = [0 as u8; 48];
     bytes_a[47] = 6;
@@ -73,7 +77,7 @@ fn test_mul_simple() {
 }
 
 #[test]
-fn test_mul_truncation() {
+fn test_fq_mul_truncation() {
     // Demonstrate truncation: multiply numbers with values in high-order limbs
     // The product will be in positions beyond our 4-limb window and get truncated
 
@@ -94,4 +98,71 @@ fn test_mul_truncation() {
     // But we only keep positions 0-3, so the actual product is truncated!
     // Result is all zeros - we lost the actual answer
     assert_eq(result.limbs, [0, 0, 0, 0]);
+}
+
+// ============================================================================
+// Tests for BrainpoolP384r1_Fr (scalar field)
+// ============================================================================
+
+#[test]
+fn test_fr_from_be_bytes() {
+    // Create a simple number: 0x0000...0042 (just 66 in the least significant byte)
+    let mut bytes = [0 as u8; 48];
+    bytes[47] = 66; // Last byte = 66
+
+    let num = BrainpoolP384r1_Fr::from_be_bytes(bytes);
+
+    // The number should be in the last limb
+    assert_eq(num.limbs, [0, 0, 0, 66]);
+}
+
+#[test]
+fn test_fr_add_simple() {
+    // Test: 5 + 3 = 8
+    let mut bytes_a = [0 as u8; 48];
+    bytes_a[47] = 5;
+    let a = BrainpoolP384r1_Fr::from_be_bytes(bytes_a);
+
+    let mut bytes_b = [0 as u8; 48];
+    bytes_b[47] = 3;
+    let b = BrainpoolP384r1_Fr::from_be_bytes(bytes_b);
+
+    let result = a.add(b);
+
+    assert_eq(result.limbs, [0, 0, 0, 8]);
+}
+
+#[test]
+fn test_fr_mul_simple() {
+    // Test: 6 * 7 = 42
+    let mut bytes_a = [0 as u8; 48];
+    bytes_a[47] = 6;
+    let a = BrainpoolP384r1_Fr::from_be_bytes(bytes_a);
+
+    let mut bytes_b = [0 as u8; 48];
+    bytes_b[47] = 7;
+    let b = BrainpoolP384r1_Fr::from_be_bytes(bytes_b);
+
+    let result = a.mul(b);
+
+    assert_eq(result.limbs, [0, 0, 0, 42]);
+}
+
+#[test]
+fn test_fr_and_fq_are_distinct_types() {
+    // This test demonstrates that Fq and Fr are distinct types at compile time
+    // Even though they have the same structure, the type system treats them differently
+
+    let mut bytes = [0 as u8; 48];
+    bytes[47] = 10;
+
+    let fq_val = BrainpoolP384r1_Fq::from_be_bytes(bytes);
+    let fr_val = BrainpoolP384r1_Fr::from_be_bytes(bytes);
+
+    // Both have the same limbs representation
+    assert_eq(fq_val.limbs, fr_val.limbs);
+
+    // But they are different types!
+    // Uncommenting the following would cause a compile error:
+    // let _sum = fq_val.add(fr_val); // ERROR: type mismatch
 }

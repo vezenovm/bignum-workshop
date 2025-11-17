@@ -1,21 +1,28 @@
-mod stage0_tests;
+mod stage1_tests;
 
-pub struct BrainpoolP384r1_Fq {
-    limbs: [u128; 4],
+// Stage 1: Generic BigNum with type parameters
+// This allows us to distinguish between different fields (Fq vs Fr) at the type level
+
+/// Generic BigNum struct parameterized by:
+/// - LIMBS: number of limbs (compile-time constant)
+/// - Params: type that provides field specific information (e.g., modulus)
+pub struct BigNum<let LIMBS: u32, Params> {
+    limbs: [u128; LIMBS],
 }
 
-impl BrainpoolP384r1_Fq {
-    /// Constructs a BigNum from big-endian bytes (48 bytes for P384)
-    /// Each limb holds 12 bytes (96 bits) of the 384-bit number
+impl<let LIMBS: u32, Params> BigNum<LIMBS, Params> {
+    /// Constructs a BigNum from big-endian bytes
+    /// Each limb holds (48/LIMBS) bytes of the number
     pub fn from_be_bytes(bytes: [u8; 48]) -> Self {
-        let mut limbs = [0; 4];
+        let mut limbs = [0; LIMBS];
+        let bytes_per_limb = 48 / LIMBS;
 
         // Parse bytes into limbs (big-endian: most significant limb first)
-        for i in 0..4 {
-            let limb_start = i * 12;
+        for i in 0..LIMBS {
+            let limb_start = i * bytes_per_limb;
             let mut limb_value: u128 = 0;
 
-            for j in 0..12 {
+            for j in 0..bytes_per_limb {
                 limb_value = limb_value * 256 + (bytes[limb_start + j] as u128);
             }
 
@@ -27,48 +34,85 @@ impl BrainpoolP384r1_Fq {
 
     /// Simple addition without carry propagation
     /// NOTE: This is a simplified implementation for educational purposes.
-    /// In production, you need to handle carries between limbs when overflow occurs.
     pub fn add(self, other: Self) -> Self {
-        let mut result_limbs = [0; 4];
+        let mut result_limbs = [0; LIMBS];
 
-        for i in 0..4 {
+        for i in 0..LIMBS {
             result_limbs[i] = self.limbs[i] + other.limbs[i];
         }
 
         Self { limbs: result_limbs }
     }
 
-    /// Naive multiplication
-    /// NOTE: This is a simplified implementation. Production code needs:
-    /// - Proper handling of the full product (which would be 8 limbs)
-    /// - Modular reduction to keep result within field
-    /// - Optimized multiplication algorithms
-    /// - Proper carry handling between limbs
+    /// Naive multiplication (only works for 4 limbs currently)
+    /// NOTE: This is a simplified implementation.
     pub fn mul(self, other: Self) -> Self {
         let mut result = [0 as u128; 8];
 
         // Schoolbook multiplication
-        // Our limbs are big-endian (limbs[0] = most sig, limbs[3] = least sig)
-        // For easier multiplication, work with reversed indices
-        for i in 0..4 {
-            for j in 0..4 {
-                // Map big-endian indices to little-endian positions
-                let i_le = 3 - i;  // limbs[3] -> position 0 (least sig)
-                let j_le = 3 - j;
-                let result_pos = i_le + j_le;  // Position in little-endian
+        for i in 0..LIMBS {
+            for j in 0..LIMBS {
+                let i_le = (LIMBS - 1) - i;
+                let j_le = (LIMBS - 1) - j;
+                let result_pos = i_le + j_le;
 
                 let product = self.limbs[i] * other.limbs[j];
                 result[result_pos] += product;
             }
         }
 
-        // Convert result back to big-endian and take only 4 limbs (truncate overflow)
-        // result[0..3] are the least significant in little-endian
-        // Map them back to big-endian: result[3], result[2], result[1], result[0]
-        Self {
-            limbs: [result[3], result[2], result[1], result[0]]
+        // Convert result back to big-endian (take lower LIMBS)
+        let mut final_limbs = [0; LIMBS];
+        for i in 0..LIMBS {
+            final_limbs[i] = result[(LIMBS - 1) - i];
         }
+        Self { limbs: final_limbs }
     }
-
-
 }
+
+// ============================================================================
+// Field-specific parameter types
+// ============================================================================
+
+/// Marker trait for BigNum parameters
+/// Each field (Fq, Fr) will have its own params type
+pub trait BigNumParamsTrait {
+    fn modulus() -> [u128; 4];
+}
+/// Parameters for BrainpoolP384r1 base field (Fq)
+pub struct BrainpoolP384r1FqParams {}
+
+impl BigNumParamsTrait for BrainpoolP384r1FqParams {
+    fn modulus() -> [u128; 4] {
+        [
+            0xd3a729901d1a71874700133107ec53,
+            0x7109ed5456b412b1da197fb71123ac,
+            0x82a3386d280f5d6f7e50e641df152f,
+            0x8cb91e,
+        ]
+    }
+}
+
+/// Parameters for BrainpoolP384r1 scalar field (Fr)
+pub struct BrainpoolP384r1FrParams {}
+
+impl BigNumParamsTrait for BrainpoolP384r1FrParams {
+    fn modulus() -> [u128; 4] {
+        [
+            0x3ab6af6b7fc3103b883202e9046565,
+            0x7109ed5456b31f166e6cac0425a7cf,
+            0x82a3386d280f5d6f7e50e641df152f,
+            0x8cb91e,
+        ]
+    }
+}
+
+// ============================================================================
+// Type aliases for convenience
+// ============================================================================
+
+/// BrainpoolP384r1 base field element
+pub type BrainpoolP384r1_Fq = BigNum<4, BrainpoolP384r1FqParams>;
+
+/// BrainpoolP384r1 scalar field element
+pub type BrainpoolP384r1_Fr = BigNum<4, BrainpoolP384r1FrParams>;
