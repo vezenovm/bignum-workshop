@@ -70,7 +70,9 @@ impl BigNum for BrainpoolP384r1_Fq {
             }
         }
 
-        Self { limbs: [result[3], result[2], result[1], result[0]] }
+        Self {
+            limbs: [result[3], result[2], result[1], result[0]]
+        }
     }
 
     fn params() -> BigNumParams {
@@ -80,7 +82,7 @@ impl BigNum for BrainpoolP384r1_Fq {
                 0x7109ed5456b412b1da197fb71123ac,
                 0x82a3386d280f5d6f7e50e641df152f,
                 0x8cb91e,
-            ],
+            ]
         }
     }
 }
@@ -129,7 +131,9 @@ impl BigNum for BrainpoolP384r1_Fr {
             }
         }
 
-        Self { limbs: [result[3], result[2], result[1], result[0]] }
+        Self {
+            limbs: [result[3], result[2], result[1], result[0]]
+        }
     }
 
     fn params() -> BigNumParams {
@@ -139,7 +143,7 @@ impl BigNum for BrainpoolP384r1_Fr {
                 0x7109ed5456b31f166e6cac0425a7cf,
                 0x82a3386d280f5d6f7e50e641df152f,
                 0x8cb91e,
-            ],
+            ]
         }
     }
 }
