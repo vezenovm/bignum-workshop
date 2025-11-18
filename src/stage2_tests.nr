@@ -1,4 +1,4 @@
-use crate::{BrainpoolP384r1_Fq, BrainpoolP384r1_Fr};
+use crate::{BigNum, BrainpoolP384r1_Fq, BrainpoolP384r1_Fr};
 
 // ============================================================================
 // Tests for BrainpoolP384r1_Fq (base field)
