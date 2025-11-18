@@ -28,7 +28,7 @@ pub struct BrainpoolP384r1_Fr {
     limbs: [u128; 4],
 }
 
-// Implement stdlib Add trait for + operator
+/// Implement stdlib Add trait for + operator
 impl Add for BrainpoolP384r1_Fq {
     fn add(self, other: Self) -> Self {
         let mut result_limbs = [0; 4];
@@ -41,7 +41,7 @@ impl Add for BrainpoolP384r1_Fq {
     }
 }
 
-// Implement stdlib Mul trait for * operator
+/// Implement stdlib Mul trait for * operator
 impl Mul for BrainpoolP384r1_Fq {
     fn mul(self, other: Self) -> Self {
         let mut result = [0 as u128; 8];
@@ -62,14 +62,14 @@ impl Mul for BrainpoolP384r1_Fq {
     }
 }
 
-// Implement stdlib Eq trait for == operator
+/// Implement stdlib Eq trait for == operator
 impl Eq for BrainpoolP384r1_Fq {
     fn eq(self, other: Self) -> bool {
         self.limbs == other.limbs
     }
 }
 
-// Implement BigNum trait
+/// Implement BigNum trait
 impl BigNum for BrainpoolP384r1_Fq {
     fn from_be_bytes(bytes: [u8; 48]) -> Self {
         let mut limbs = [0; 4];
@@ -101,7 +101,7 @@ impl BigNum for BrainpoolP384r1_Fq {
     }
 }
 
-// Implement stdlib Add trait for + operator
+/// Implement stdlib Add trait for + operator
 impl Add for BrainpoolP384r1_Fr {
     fn add(self, other: Self) -> Self {
         let mut result_limbs = [0; 4];
@@ -114,7 +114,7 @@ impl Add for BrainpoolP384r1_Fr {
     }
 }
 
-// Implement stdlib Mul trait for * operator
+/// Implement stdlib Mul trait for * operator
 impl Mul for BrainpoolP384r1_Fr {
     fn mul(self, other: Self) -> Self {
         let mut result = [0 as u128; 8];
@@ -135,14 +135,14 @@ impl Mul for BrainpoolP384r1_Fr {
     }
 }
 
-// Implement stdlib Eq trait for == operator
+/// Implement stdlib Eq trait for == operator
 impl Eq for BrainpoolP384r1_Fr {
     fn eq(self, other: Self) -> bool {
         self.limbs == other.limbs
     }
 }
 
-// Implement BigNum trait
+/// Implement BigNum trait
 impl BigNum for BrainpoolP384r1_Fr {
     fn from_be_bytes(bytes: [u8; 48]) -> Self {
         let mut limbs = [0; 4];
