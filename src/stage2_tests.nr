@@ -18,7 +18,7 @@ fn test_fq_from_be_bytes() {
 
 #[test]
 fn test_fq_add_simple() {
-    // Test: 5 + 3 = 8
+    // Test: 5 + 3 = 8 using + operator
     let mut bytes_a = [0 as u8; 48];
     bytes_a[47] = 5;
     let a = BrainpoolP384r1_Fq::from_be_bytes(bytes_a);
@@ -27,9 +27,13 @@ fn test_fq_add_simple() {
     bytes_b[47] = 3;
     let b = BrainpoolP384r1_Fq::from_be_bytes(bytes_b);
 
-    let result = a.add(b);
+    let result = a + b; // Using + operator!
 
-    assert_eq(result.limbs, [0, 0, 0, 8]);
+    let mut expected_bytes = [0 as u8; 48];
+    expected_bytes[47] = 8;
+    let expected = BrainpoolP384r1_Fq::from_be_bytes(expected_bytes);
+
+    assert(result == expected); // Using == operator!
 }
 
 #[test]
@@ -50,7 +54,7 @@ fn test_fq_add_overflow_limitation() {
     bytes_one[47] = 1;
     let one = BrainpoolP384r1_Fq::from_be_bytes(bytes_one);
 
-    let result = max_limb.add(one);
+    let result = max_limb + one; // Using + operator!
 
     // In a proper implementation, limbs[3] would overflow and carry to limbs[2]
     // But our simple implementation doesn't handle carries, so the overflow wraps around
@@ -62,7 +66,7 @@ fn test_fq_add_overflow_limitation() {
 
 #[test]
 fn test_fq_mul_simple() {
-    // Test: 6 * 7 = 42
+    // Test: 6 * 7 = 42 using * operator
     let mut bytes_a = [0 as u8; 48];
     bytes_a[47] = 6;
     let a = BrainpoolP384r1_Fq::from_be_bytes(bytes_a);
@@ -71,9 +75,13 @@ fn test_fq_mul_simple() {
     bytes_b[47] = 7;
     let b = BrainpoolP384r1_Fq::from_be_bytes(bytes_b);
 
-    let result = a.mul(b);
+    let result = a * b; // Using * operator!
 
-    assert_eq(result.limbs, [0, 0, 0, 42]);
+    let mut expected_bytes = [0 as u8; 48];
+    expected_bytes[47] = 42;
+    let expected = BrainpoolP384r1_Fq::from_be_bytes(expected_bytes);
+
+    assert(result == expected); // Using == operator!
 }
 
 #[test]
@@ -91,7 +99,7 @@ fn test_fq_mul_truncation() {
     bytes_b[11] = 3; // Last byte of first limb = 3
     let b = BrainpoolP384r1_Fq::from_be_bytes(bytes_b);
 
-    let result = a.mul(b);
+    let result = a * b; // Using * operator!
 
     // The product 2 * 3 = 6 would be at position limbs[0] * limbs[0] in the full result
     // In little-endian, that's position 6 in the 8-limb array
@@ -118,7 +126,7 @@ fn test_fr_from_be_bytes() {
 
 #[test]
 fn test_fr_add_simple() {
-    // Test: 5 + 3 = 8
+    // Test: 5 + 3 = 8 using + operator
     let mut bytes_a = [0 as u8; 48];
     bytes_a[47] = 5;
     let a = BrainpoolP384r1_Fr::from_be_bytes(bytes_a);
@@ -127,14 +135,18 @@ fn test_fr_add_simple() {
     bytes_b[47] = 3;
     let b = BrainpoolP384r1_Fr::from_be_bytes(bytes_b);
 
-    let result = a.add(b);
+    let result = a + b; // Using + operator!
 
-    assert_eq(result.limbs, [0, 0, 0, 8]);
+    let mut expected_bytes = [0 as u8; 48];
+    expected_bytes[47] = 8;
+    let expected = BrainpoolP384r1_Fr::from_be_bytes(expected_bytes);
+
+    assert(result == expected); // Using == operator!
 }
 
 #[test]
 fn test_fr_mul_simple() {
-    // Test: 6 * 7 = 42
+    // Test: 6 * 7 = 42 using * operator
     let mut bytes_a = [0 as u8; 48];
     bytes_a[47] = 6;
     let a = BrainpoolP384r1_Fr::from_be_bytes(bytes_a);
@@ -143,9 +155,13 @@ fn test_fr_mul_simple() {
     bytes_b[47] = 7;
     let b = BrainpoolP384r1_Fr::from_be_bytes(bytes_b);
 
-    let result = a.mul(b);
+    let result = a * b; // Using * operator!
 
-    assert_eq(result.limbs, [0, 0, 0, 42]);
+    let mut expected_bytes = [0 as u8; 48];
+    expected_bytes[47] = 42;
+    let expected = BrainpoolP384r1_Fr::from_be_bytes(expected_bytes);
+
+    assert(result == expected); // Using == operator!
 }
 
 #[test]
@@ -164,5 +180,25 @@ fn test_fr_and_fq_are_distinct_types() {
 
     // But they are different types!
     // Uncommenting the following would cause a compile error:
-    // let _sum = fq_val.add(fr_val); // ERROR: type mismatch
+    // let _sum = fq_val + fr_val; // ERROR: type mismatch
+}
+
+#[test]
+fn test_equality_operator() {
+    // Test the == operator
+    let mut bytes_a = [0 as u8; 48];
+    bytes_a[47] = 42;
+    let a = BrainpoolP384r1_Fq::from_be_bytes(bytes_a);
+
+    let mut bytes_b = [0 as u8; 48];
+    bytes_b[47] = 42;
+    let b = BrainpoolP384r1_Fq::from_be_bytes(bytes_b);
+
+    let mut bytes_c = [0 as u8; 48];
+    bytes_c[47] = 99;
+    let c = BrainpoolP384r1_Fq::from_be_bytes(bytes_c);
+
+    // Using == operator!
+    assert(a == b);
+    assert(a != c);
 }
