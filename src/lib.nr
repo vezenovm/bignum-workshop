@@ -17,10 +17,6 @@ pub trait BigNum: Add + Mul + Eq {
     fn params() -> BigNumParams;
 }
 
-// ============================================================================
-// Generalized helper functions that operate on limb arrays
-// ============================================================================
-
 /// Add two limb arrays
 pub fn add_limbs<let N: u32>(lhs: [u128; N], rhs: [u128; N]) -> [u128; N] {
     let mut result = [0; N];
