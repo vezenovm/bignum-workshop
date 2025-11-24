@@ -1,18 +1,3 @@
-# noir-library-starter
-
-This repository is a template used by the noir-lang org when creating internally maintained libraries.
-
-This provides out of the box:
-
-- A simple CI setup to test and format the library
-- A canary flagging up compilation failures on nightly releases.
-- A [release-please](https://github.com/googleapis/release-please) setup to ease creating releases for the library.
-- Contributing guidelines specified in [CONTRIBUTING.md](CONTRIBUTING.md)
-
-Feel free to use this template as a starting point to create your own Noir libraries.
-
----
-
 # BigNum Workshop
 
 This is a hands-on workshop that teaches how to build a BigNum (large integer arithmetic) library in Noir through progressive stages. The repository contains multiple branches, each representing a stage in the development process.
