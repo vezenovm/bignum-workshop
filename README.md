@@ -13,9 +13,18 @@ Feel free to use this template as a starting point to create your own Noir libra
 
 ---
 
-# LIBRARY_NAME
+# BigNum Workshop
 
-Add a brief description of the library
+This is a hands-on workshop that teaches how to build a BigNum (large integer arithmetic) library in Noir through progressive stages. The repository contains multiple branches, each representing a stage in the development process.
+
+## Workshop Stages
+
+This workshop is split into branches:
+- `stage0`: Basic BigNum implementation
+- `stage1`: Generic BigNum with type parameters
+- `stage2a`: BigNum trait interface
+- `stage2b`: Operator overloading (+, *, ==)
+- `stage3`: Metaprogramming with derive_bignum
 
 ## Noir version compatibility
 
